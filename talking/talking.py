@@ -66,7 +66,7 @@ def tuling(b):
         return f
 
 def hecheng(text,y_token):
-        #text="你好我是机器人牛牛很高兴能够认识你"
+        #text="你好我是机器人小派, 很高兴能够认识你"
         geturl="http://tsn.baidu.com/text2audio?tex="+text+"&lan=zh&per=1&pit=9&spd=6&cuid=CCyo6UGf16ggKZGwGpQYL9Gx&ctp=1&tok="+y_token
         return os.system('omxplayer "%s" > /dev/null 2>&1 '%(geturl))
         #return os.system('omxplayer "%s" > /dev/null 2>&1 '%(geturl))
@@ -82,14 +82,14 @@ while True:
         #if ganying()!=0:
                 run=open('run.log','a')
                 if first==0:
-                        hecheng("你好,我是牛牛机器人,你可以和我聊天,不过说话的时候你必须靠近话筒近一点,",y_token)
-                        hecheng("说点什么吧,2秒钟内说完哦.",y_token)
+                        hecheng("你好,我是小派机器人,你可以和我聊天,不过说话的时候你必须靠近话筒近一点,",y_token)
+                        hecheng("说点什么吧,5秒钟内说完哦.",y_token)
                         first=1                 #为1一段时间就不执行
                         num=0                   #从新计数
 
                 #print ganying()
-                run.write(nowtime()+"说点神马吧..........."+'\n')
-                print nowtime()+"说点神马吧.........."
+                run.write(nowtime()+"主人，请说话吧..........."+'\n')
+                print nowtime()+"主人，请说话吧.........."
                 luyin()                         #开始录音
                 out=fanyi().encode("utf-8")     #翻译文字
                 run.write(nowtime()+"我说:"+out+'\n')
@@ -101,8 +101,8 @@ while True:
                 else:
                         text=tuling(out)
                         hecheng(text,y_token)
-                print nowtime()+"牛牛:"+text
-                run.write(nowtime()+"牛牛:"+text+'\n')
+                print nowtime()+"小派:"+text
+                run.write(nowtime()+"小派:"+text+'\n')
                 run.close()
         #else:
                 #print ganying()        #调试查看是否为0有人没人
