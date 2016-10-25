@@ -37,6 +37,6 @@ while True:
     distance = round(distance, 2)
 
     print "Distance:", distance, "cm"
-
+    time.sleep(1)
 GPIO.cleanup()
 sys.exit()
