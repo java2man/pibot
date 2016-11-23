@@ -9,6 +9,7 @@ import uuid
 import base64
 import os
 import time
+import speech_recognition as sr
 #from renti import *
 
 #获取百度token
@@ -22,12 +23,23 @@ y_post=urllib2.urlopen(baidu_url)
 y_read=y_post.read()
 y_token=json.loads(y_read)['access_token']
 #print y_read
-#print y_token
+print y_token
 
 #------------------function-------------
 
 def luyin():
-        os.system('arecord -D plughw:1,0 -c 1 -d 5 1.wav -r 8000 -f S16_LE 2>/dev/null')
+        os.system('arecord -D plughw:1,0 -c 1 -d 4 1.wav -r 8000 -f S16_LE 2>/dev/null')
+
+def record():
+        # obtain audio from the microphone
+        r = sr.Recognizer()
+        with sr.Microphone(sample_rate=8000) as source:
+            print("Say something!")
+            audio = r.listen(source)
+
+	   # write audio to a WAV file
+        with open("1.wav", "wb") as f:
+            f.write(audio.get_wav_data())
 
 def fanyi():
         #http://vop.baidu.com/server_api?lan=zh&cuid=***&token=***
@@ -36,7 +48,6 @@ def fanyi():
         mac_address="raspberrypi3"
         with open("1.wav",'rb') as f:
             s_file = f.read()
-
 
         speech_base64=base64.b64encode(s_file).decode('utf-8')
         speech_length=len(s_file)
@@ -80,30 +91,34 @@ num=0   #num用来判断是第一次说话，还是在对话过程中
 first=1 #判断是不是第一说话  当1000次没有人动认为是第一次
 while True:
         #if ganying()!=0:
-                run=open('run.log','a')
+                #run=open('run.log','a')
                 if first==0:
                         hecheng("你好,我是小派机器人,你可以和我聊天,不过说话的时候你必须靠近话筒近一点,",y_token)
-                        hecheng("说点什么吧,5秒钟内说完哦.",y_token)
+                        hecheng("说点什么吧,4秒钟内说完哦.",y_token)
                         first=1                 #为1一段时间就不执行
                         num=0                   #从新计数
 
                 #print ganying()
-                run.write(nowtime()+"主人，请说话吧..........."+'\n')
+                #run.write(nowtime()+"主人，请说话吧..........."+'\n')
                 print nowtime()+"主人，请说话吧.........."
-                luyin()                         #开始录音
+                
+                #luyin()                         #开始录音
+                record()
                 out=fanyi().encode("utf-8")     #翻译文字
-                run.write(nowtime()+"我说:"+out+'\n')
+                #run.write(nowtime()+"我说:"+out+'\n')
                 print nowtime()+"我说:"+out
                 if out == "Null":
                         text="没有听清楚你说什么"
-                        os.system('omxplayer "shenme.wav" > /dev/null 2>&1 ')
+                        hecheng(text,y_token)
+                        #os.system('omxplayer "shenme.wav" > /dev/null 2>&1 ')
 
                 else:
                         text=tuling(out)
                         hecheng(text,y_token)
+                        
                 print nowtime()+"小派:"+text
-                run.write(nowtime()+"小派:"+text+'\n')
-                run.close()
+                #run.write(nowtime()+"小派:"+text+'\n')
+                #run.close()
         #else:
                 #print ganying()        #调试查看是否为0有人没人
                 #print num
