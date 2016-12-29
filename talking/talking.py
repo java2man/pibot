@@ -11,6 +11,7 @@ import os
 import time
 import speech_recognition as sr
 from gtts import gTTS
+
 # from tempfile import TemporaryFile
 # import wave, pymedia.audio.sound as sound
 
@@ -27,6 +28,9 @@ y_post = urllib2.urlopen(baidu_url)
 y_read = y_post.read()
 y_token = json.loads(y_read)['access_token']
 #print y_token
+
+#execfile("/home/pi/pibot/moving/moving.py")
+#init()
 
 #------------------function-------------
 """
@@ -117,6 +121,66 @@ def hecheng(_text):
 def nowtime():
     return time.strftime('%Y-%m-%d %H:%M:%S ')
 
+########## Moving ############
+#引入gpio的模块
+import RPi.GPIO as GPIO
+#设置in1到in4接口
+IN1 = 11
+IN2 = 12
+IN3 = 13
+IN4 = 15
+#初始化接口
+def init():
+    #设置GPIO模式
+    GPIO.setmode(GPIO.BOARD)
+    
+    GPIO.setup(IN1,GPIO.OUT)
+    GPIO.setup(IN2,GPIO.OUT)
+    GPIO.setup(IN3,GPIO.OUT)
+    GPIO.setup(IN4,GPIO.OUT)
+
+#前进的代码
+def forward(sleep_time):
+    GPIO.output(IN1,GPIO.HIGH)
+    GPIO.output(IN2,GPIO.LOW)
+    GPIO.output(IN3,GPIO.HIGH)
+    GPIO.output(IN4,GPIO.LOW)
+    time.sleep(sleep_time)
+    GPIO.cleanup()
+
+#后退
+def backward(sleep_time):
+    GPIO.output(IN1,GPIO.LOW)
+    GPIO.output(IN2,GPIO.HIGH)
+    GPIO.output(IN3,GPIO.LOW)
+    GPIO.output(IN4,GPIO.HIGH)
+    time.sleep(sleep_time)
+    GPIO.cleanup()
+
+#Turn right
+def right(sleep_time):
+    GPIO.output(IN1,False)
+    GPIO.output(IN2,False)
+    GPIO.output(IN3,GPIO.HIGH)
+    GPIO.output(IN4,GPIO.LOW)
+    time.sleep(sleep_time)
+    GPIO.cleanup()
+
+#Turn left
+def left(sleep_time):
+    GPIO.output(IN1,GPIO.HIGH)
+    GPIO.output(IN2,GPIO.LOW)
+    GPIO.output(IN3,False)
+    GPIO.output(IN4,False)
+    time.sleep(sleep_time)
+    GPIO.cleanup()
+
+def stop():
+    GPIO.output(IN1,False)
+    GPIO.output(IN2,False)
+    GPIO.output(IN3,False)
+    GPIO.output(IN4,False)
+    GPIO.cleanup()
 #---------------main-----------------
 first = 0
 while True:
@@ -142,9 +206,25 @@ while True:
         #hecheng(text, y_token)
         continue
     else:
-        text = tuling(out)
-        #hecheng(text, y_token)
-        hecheng(text)
+        if '前进' in out:
+            init()
+            forward(2)
+        elif '后退' in out:
+            init()
+            backward(2)
+        elif '左转' in out:
+            init()
+            left(2)
+        elif '右转' in out:
+            init()
+            right(2)
+        elif '停止' in out:
+            init()
+            stop()
+        else:
+            text = tuling(out)
+            #hecheng(text, y_token)
+            hecheng(text)
         time.sleep(0.2)
             
     print nowtime() + "小派:" + text
