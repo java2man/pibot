@@ -10,7 +10,12 @@ import base64
 import os
 import time
 import speech_recognition as sr
+from gtts import gTTS
+# from tempfile import TemporaryFile
+# import wave, pymedia.audio.sound as sound
 
+# Set a higher recursion depth
+sys.setrecursionlimit(1500)
 #获取百度token
 appid = 8757898
 apikey = "UstfHllbqAZ9jKKTAOOfDurY"
@@ -84,11 +89,31 @@ def tuling(requestText):
     responseText = json.loads(f.read())['text']
     return responseText
 
+"""
 def hecheng(text,y_token):
     #text="你好我是机器人小派, 很高兴能够认识你"
     geturl = "http://tsn.baidu.com/text2audio?tex="+text+"&lan=zh&per=1&pit=9&spd=6&cuid=CCyo6UGf16ggKZGwGpQYL9Gx&ctp=1&tok="+y_token
-    return os.system('omxplayer "%s" > /dev/null 2>&1 '%(geturl))
+    #return os.system('omxplayer "%s" > /dev/null 2>&1 '%(geturl))
+    return os.system('omxplayer "%s"'%(geturl))
+"""
+def hecheng(_text):
+    tts = gTTS(text=_text + '。', lang='zh')
+    tts.save("gtts.mp3")
+    return os.system('omxplayer gtts.mp3')
 
+    """
+    f = TemporaryFile()
+    tts.write_to_fp(f)
+    # Play f
+    sampleRate = f.getframerate()
+    channels = f.getnchannels()
+    format = sound.AFMT_S16_LE
+    snd = sound.Output( sampleRate, channels, format )
+    s = f.readframes( 300000 )
+    snd.play(s)
+    while snd.isPlaying(): time.sleep( 0.05 )
+    f.close()
+    """
 def nowtime():
     return time.strftime('%Y-%m-%d %H:%M:%S ')
 
@@ -97,7 +122,8 @@ first = 0
 while True:
     #run=open('run.log','a')
     if first == 0:
-        hecheng("你好,我是小派机器人,你可以和我聊天,不过说话的时候你必须靠近话筒近一点",y_token)
+        #hecheng("你好,我是小派机器人,你可以和我聊天,不过说话的时候请你靠近话筒近一点",y_token)
+        hecheng("主人你好,我是小派机器人,说话的时候请你靠近话筒近一点")
         first = 1                 #为1一段时间就不执行
 
     #print ganying()
@@ -117,7 +143,8 @@ while True:
         continue
     else:
         text = tuling(out)
-        hecheng(text, y_token)
-        time.sleep(0.5)
+        #hecheng(text, y_token)
+        hecheng(text)
+        time.sleep(0.2)
             
     print nowtime() + "小派:" + text
